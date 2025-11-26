@@ -1,4 +1,5 @@
 import authModel, { type IUser } from "./models/user.model.ts";
+import albumModel, { type IAlbum } from "./models/album.model.ts";
 
 class AuthService {
   async registerUser(userData: IUser) {
@@ -15,6 +16,16 @@ class AuthService {
     if (!userData) throw new Error("not received info for login");
     const authorizatedUser = authModel.findOne({ username: userData.username });
     return authorizatedUser;
+  }
+
+  async newAlbum(albumData: IAlbum) {
+    if (!albumData) throw new Error("not received info for album");
+    try {
+      const createdAlbum = albumModel.create(albumData);
+      return createdAlbum;
+    } catch (e) {
+      throw new Error("db create album error: " + e);
+    }
   }
 }
 
