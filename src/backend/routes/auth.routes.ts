@@ -2,6 +2,7 @@ import { Router, type Request, type Response } from "express";
 import authController from "./auth.controller.ts";
 import upload from "../utils/storageMulter.ts";
 import authMiddleware from "../middlewares/auth.middleware.ts";
+import authAlbumMidddleware from "../middlewares/authAlbum.middleware.ts";
 
 const router: Router = Router();
 
@@ -16,6 +17,8 @@ router.post("/login", authController.loginUser);
 
 //cooikes
 router.get("/verify-token", authController.verifyToken);
+
+//albums
 router.post(
   "/create-album",
   authMiddleware,
@@ -23,5 +26,13 @@ router.post(
   authController.createAlbum
 );
 router.post("/upload", upload.single("file"), authController.postPhoto);
+router.get("/album:id", authController.getAlbum);
+router.post(
+  "/album/:id/add-photos",
+  authMiddleware,
+  authAlbumMidddleware,
+  upload.array("file", 100),
+  authController.addPhototoAlbum
+);
 
 export default router;

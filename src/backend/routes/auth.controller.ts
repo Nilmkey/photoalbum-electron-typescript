@@ -48,7 +48,7 @@ class AuthController {
           authorizationUser.password
         );
         if (!isLogin) {
-          return res.status(401).json({ messageError: "password not correct" });
+          return res.status(400).json({ messageError: "password not correct" });
         }
         const data: JWTPayload = {
           id: authorizationUser.id,
@@ -75,18 +75,19 @@ class AuthController {
       return res.status(401);
     } else {
       return res.status(200).json({ decoded });
+      //fff
     }
   }
 
-  async getCookies(req: Request, res: Response) {
-    try {
-      const sssCokie = req.cookies["sss"];
-      console.log(sssCokie);
-      res.status(200).json(sssCokie);
-    } catch (e) {
-      res.status(500).json("cookie error" + e);
-    }
-  }
+  // async getCookies(req: Request, res: Response) {
+  //   try {
+  //     const sssCokie = req.cookies["sss"];
+  //     console.log(sssCokie);
+  //     res.status(200).json(sssCokie);
+  //   } catch (e) {
+  //     res.status(500).json("cookie error" + e);
+  //   }
+  // }
 
   async createAlbum(req: Request, res: Response) {
     if (!req.user) return res.status(401).json({ error: "user not auth" });
@@ -113,6 +114,36 @@ class AuthController {
     }
   }
 
+  async getAlbum(req: Request, res: Response) {
+    if (!req.params.id)
+      return res.status(404).json({ error: "id not received" });
+    const idAlbum: string = req.params.id;
+    try {
+      const album = await authService.oneAlbum(idAlbum);
+      return res.status(200).json(album);
+    } catch (e) {
+      console.log(e);
+      return res.status(500).json(e);
+    }
+  }
+
+  async addPhototoAlbum(req: Request, res: Response) {
+    if (!req.params.id)
+      return res.status(404).json({ error: "id not received" });
+    if (!req.files)
+      return res.status(403).json({ error: "files not received" });
+    const files = req.files as Express.Multer.File[];
+    const idAlbum: string = req.params.id;
+    const pathsArray: string[] = files.map((file) => file.path);
+    try {
+      const uploadPhotos = await authService.addPhoto(idAlbum, pathsArray);
+      return res.status(200).json(uploadPhotos);
+    } catch (e) {
+      return res.status(500).json({ error: e });
+    }
+  }
+
+  //эту хуйню надо переделать
   async postPhoto(req: Request, res: Response) {
     if (!req.user) return res.status(401).json({ error: "youre not logined" });
     if (!req.file) return res.status(403).json({ message: "no found photo" });

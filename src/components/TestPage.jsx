@@ -19,6 +19,12 @@ export default function AuthUploadPage() {
     return token;
   }
 
+  //удаление куков
+  async function removeCookies(name) {
+    const removeToken = await window.electronAPI.removeCookie(name);
+    return removeToken;
+  }
+
   // ЛОГИН
   async function login() {
     const res = await fetch("http://localhost:3050/api/login", {

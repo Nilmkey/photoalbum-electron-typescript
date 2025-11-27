@@ -88,3 +88,17 @@ ipcMain.handle(
     }
   }
 );
+
+ipcMain.handle("remove-cookie", async (_event, cookie: { name: string }) => {
+  try {
+    await session.defaultSession.cookies.remove(
+      "http:/localhost:3050",
+      cookie.name
+    );
+    console.log(cookie.name + " was remove");
+    return true;
+  } catch (e) {
+    console.log("REMOVE COOKIE ERROR" + e);
+    return false;
+  }
+});
