@@ -22,17 +22,13 @@ export default function NewAlbum() {
     e.preventDefault();
 
     const newAlbum = {
-      id: Date.now(),
       title,
       description: desc,
-      author: author || "Не указан",
       room,
       photos: cover ? [cover] : [],
-      year: new Date().getFullYear(),
     };
 
-    const saved = JSON.parse(localStorage.getItem("albums") || "[]");
-    saved.push(newAlbum);
+    // const res = fetch() // сюда фетч запрос ебнуть на создание альбома
 
     localStorage.setItem("albums", JSON.stringify(saved));
 

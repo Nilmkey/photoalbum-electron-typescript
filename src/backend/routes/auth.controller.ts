@@ -89,8 +89,10 @@ class AuthController {
   }
 
   async createAlbum(req: Request, res: Response) {
-    if (!req.user) res.status(401).json({ error: "user not auth" });
-    if (!req.body) res.status(400).json({ error: "no req body" });
+    if (!req.user) return res.status(401).json({ error: "user not auth" });
+    if (!req.body) return res.status(400).json({ error: "no req body" });
+    if (!req.file) return res.status(401).json({ error: "not found photos" });
+    const { path } = req.file;
     const body = req.body;
     const userId = req.user?.id;
     const dataAlbum = {
@@ -98,7 +100,7 @@ class AuthController {
       userId: userId,
       title: body.title,
       room: body.room,
-      cover: body.cover,
+      cover: path,
       description: body.description,
       photos: body.photos,
     } as IAlbum;

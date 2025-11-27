@@ -1,5 +1,5 @@
 import type { NextFunction, Request, Response } from "express";
-import { verifyToken } from "../utils/token";
+import { verifyToken } from "../utils/token.ts";
 
 export default function authMiddleware(
   req: Request,

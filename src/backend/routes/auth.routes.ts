@@ -16,7 +16,12 @@ router.post("/login", authController.loginUser);
 
 //cooikes
 router.get("/verify-token", authController.verifyToken);
-router.post("/create-album", authMiddleware, authController.createAlbum);
+router.post(
+  "/create-album",
+  authMiddleware,
+  upload.single("cover"),
+  authController.createAlbum
+);
 router.post("/upload", upload.single("file"), authController.postPhoto);
 
 export default router;
