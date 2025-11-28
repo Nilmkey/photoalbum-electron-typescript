@@ -21,10 +21,10 @@ export default function NewAlbum() {
   function handleCreate(e) {
     e.preventDefault();
 
-    // Загружаем список сохранённых альбомов
+    // загружаем список сохранённых альбомов
     const saved = JSON.parse(localStorage.getItem("albums") || "[]");
 
-    // Проверка: существует ли альбом с таким названием
+    // проверка существует ли альбом с таким названием
     const exists = saved.some(
       (a) => a.title.trim().toLowerCase() === title.trim().toLowerCase()
     );
@@ -34,7 +34,7 @@ export default function NewAlbum() {
       return;
     }
 
-    // Создаём новый альбом
+    // создаём новый альбом
     const newAlbum = {
       id: Date.now(),
       title: title.trim(),
