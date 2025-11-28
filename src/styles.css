@@ -16,8 +16,16 @@ html[data-theme="dark"] {
   color-scheme: dark;
 }
 
-html .btn {
+html[data-theme="dark"] option {
+  background: #55555537;
+}
+.btn {
   background: #16306d;
+}
+
+html[data-theme="light"] .btn {
+  background: #4a8cff;
+  border: none;
 }
 
 * {
