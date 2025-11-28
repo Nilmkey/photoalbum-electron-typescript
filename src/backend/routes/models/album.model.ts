@@ -7,6 +7,7 @@ export interface IAlbum extends Document {
   room: string;
   cover: string;
   description: string;
+  author: string;
   photos: [string];
 }
 
@@ -17,6 +18,7 @@ const albumSchema = new Schema<IAlbum>(
     title: { type: String, required: true },
     room: { type: String, required: true },
     cover: { type: String, required: true },
+    author: { type: String, required: true },
     description: { type: String },
     photos: [
       {

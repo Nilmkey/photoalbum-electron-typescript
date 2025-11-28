@@ -51,6 +51,30 @@ class AuthService {
       throw new Error("db add photos error: " + e);
     }
   }
+
+  async getAllAlbum() {
+    try {
+      const album = await albumModel.find();
+      if (!album) throw new Error("альбомов несуществует");
+      return album;
+    } catch (e) {
+      throw new Error("db get all albums error:" + e);
+    }
+  }
+
+  async removeAlbum(albumId: string) {
+    try {
+      if (!albumId) throw new Error("album not found");
+      const delAlbum = await albumModel.deleteOne({ id: albumId });
+      return delAlbum;
+    } catch (e) {
+      throw new Error("db remove album error:" + e);
+    }
+  }
+
+  async removePhoto(albumId: string) {
+    if (!albumId) throw new Error("album not found");
+  }
 }
 
 export default new AuthService();

@@ -6,6 +6,7 @@ import { generateToken, type JWTPayload } from "../utils/token.ts";
 import { v4 as uuidv4 } from "uuid";
 import { verifyToken } from "../utils/token.ts";
 import type { IAlbum } from "./models/album.model.ts";
+import { error } from "console";
 
 class AuthController {
   async regUser(req: Request, res: Response) {
@@ -96,12 +97,14 @@ class AuthController {
     const { path } = req.file;
     const body = req.body;
     const userId = req.user?.id;
+    const usernameAuthor = req.user?.username;
     const dataAlbum = {
       id: "ALBUM-" + uuidv4(),
       userId: userId,
       title: body.title,
       room: body.room,
       cover: path,
+      author: usernameAuthor,
       description: body.description,
       photos: body.photos,
     } as IAlbum;
@@ -143,17 +146,37 @@ class AuthController {
     }
   }
 
-  //эту хуйню надо переделать
-  async postPhoto(req: Request, res: Response) {
-    if (!req.user) return res.status(401).json({ error: "youre not logined" });
-    if (!req.file) return res.status(403).json({ message: "no found photo" });
-    const { path, filename } = req.file;
-    //находим альбом и обновляем его массив photos новым путем
-    return res.status(200).json({
-      message: "photo has uploaded",
-      path: "photo path: " + path,
-      filename: "photo filename: " + filename,
-    });
+  async removeAlbum(req: Request, res: Response) {
+    if (!req.params.id)
+      return res.status(404).json({ error: "id not received" });
+    try {
+      const albumId = req.params.id;
+      const delAlbum = await authService.removeAlbum(albumId);
+      return res.status(200).json(delAlbum);
+    } catch (e) {
+      return res.status(500).json({ error: e });
+    }
+  }
+
+  async getAlbums(_req: Request, res: Response) {
+    try {
+      const arrayAlbums = await authService.getAllAlbum();
+      return res.status(200).json(arrayAlbums);
+    } catch (e) {
+      return res.status(500).json({ error: e });
+    }
+  }
+
+  async removePhoto(req: Request, res: Response) {
+    if (!req.params.id)
+      return res.status(404).json({ error: "id not received" });
+    try {
+      const albumId = req.params.id;
+      const album = await authService.removePhoto(albumId);
+      return res.status(200).json(album);
+    } catch (e) {
+      return res.status(500).json({ error: e });
+    }
   }
 }
 

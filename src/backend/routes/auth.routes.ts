@@ -25,7 +25,6 @@ router.post(
   upload.single("cover"),
   authController.createAlbum
 );
-router.post("/upload", upload.single("file"), authController.postPhoto);
 router.get("/album:id", authController.getAlbum);
 router.post(
   "/album/:id/add-photos",
@@ -33,6 +32,19 @@ router.post(
   authAlbumMidddleware,
   upload.array("file", 100),
   authController.addPhototoAlbum
+);
+router.get("/albums", authController.getAlbums);
+router.delete(
+  "/album/:id/remove-album",
+  authMiddleware,
+  authAlbumMidddleware,
+  authController.removeAlbum
+);
+router.delete(
+  "/album/:id/remove-photo",
+  authMiddleware,
+  authAlbumMidddleware,
+  authController.removePhoto()
 );
 
 export default router;
