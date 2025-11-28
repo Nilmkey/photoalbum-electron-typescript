@@ -4,7 +4,7 @@ const mock = {
       id: "a1",
       room: "Memes",
       title: "Мемасики",
-      description: "Посмотрите и посмейтесь",
+      description: "Вся смешнявка в одном альбоме",
       year: 2025,
       month: 12,
       day: 1,

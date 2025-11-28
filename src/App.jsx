@@ -5,6 +5,7 @@ import Lightbox from "./components/Lightbox";
 import mock from "./mock-data";
 import { Link } from "react-router-dom";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import SwitchTheme from "./components/SwitchTheme";
 
 export default function App() {
   const [filters, setFilters] = useState({
@@ -74,7 +75,7 @@ export default function App() {
           <div className="auth">
             {!localStorage.getItem("user") ? (
               <>
-                <Link to="/login" className="btn">
+                <Link to="/login" className="btn btn-primary">
                   Войти
                 </Link>
                 <Link to="/register" className="btn btn-primary">
@@ -95,6 +96,7 @@ export default function App() {
           </div>
         </div>
       </header>
+      <SwitchTheme />
 
       <FilterBar
         filters={filters}
@@ -105,9 +107,11 @@ export default function App() {
       />
 
       <div className="top-controls">
-        <Link to="/create" className="create-btn">
-          + Создать альбом
-        </Link>
+        {localStorage.getItem("user") && (
+          <Link to="/create" className="create-btn">
+            + Создать альбом
+          </Link>
+        )}
       </div>
 
       <main>

@@ -4,12 +4,25 @@ import style from "./register.module.css";
 
 export default function Register() {
   const navigate = useNavigate();
+
   const [form, setForm] = useState({
     name: "",
-    email: "",
     password: "",
     password2: "",
   });
+
+  async function registerUser(username, password) {
+    const res = await fetch("http://localhost:3050/api/register", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        username: username,
+        password: password,
+      }),
+    });
+
+    return res.json(); // backend должен вернуть JSON
+  }
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -24,32 +37,21 @@ export default function Register() {
       return;
     }
 
-    const data = {
-      username: form.name,
-      email: form.email,
-      password: form.password,
-    };
-
     try {
-      const response = await fetch("/register", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
-      });
+      const result = await registerUser(form.name, form.password);
 
-      const result = await response.json();
-      console.log("Ответ сервера:", result);
+      console.log("ответ:", result);
 
-      if (response.ok) {
+      if (result.success) {
+        // можешь сохранять токен, если backend его даёт
         localStorage.setItem("user", JSON.stringify({ name: form.name }));
-
         navigate("/");
       } else {
-        alert("Ошибка регистрации: " + result.message);
+        alert("Ошибка: " + result.message);
       }
     } catch (error) {
-      console.error("Ошибка при отправке данных:", error);
-      alert("Ошибка при отправке данных");
+      console.error("Ошибка:", error);
+      alert("Произошла ошибка регистрации");
     }
   };
 
@@ -57,6 +59,7 @@ export default function Register() {
     <div className={style["auth-container"]}>
       <div className={style["auth-box"]}>
         <h2>Регистрация</h2>
+
         <form onSubmit={handleSubmit}>
           <label>Логин</label>
           <input
@@ -65,16 +68,6 @@ export default function Register() {
             value={form.name}
             onChange={handleChange}
             placeholder="Введите логин"
-            required
-          />
-
-          <label>Email</label>
-          <input
-            type="email"
-            name="email"
-            value={form.email}
-            onChange={handleChange}
-            placeholder="Введите email"
             required
           />
 
@@ -98,12 +91,15 @@ export default function Register() {
             required
           />
 
-          <button type="submit">Зарегистрироваться</button>
+          <button type="submit" className={style["btn-primary"]}>
+            Зарегистрироваться
+          </button>
         </form>
 
         <p className={style["auth-link"]}>
           Уже есть аккаунт? <Link to="/login">Войти</Link>
         </p>
+
         <Link className={style["auth-link"]} to="/">
           Назад
         </Link>

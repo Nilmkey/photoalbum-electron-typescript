@@ -1,19 +1,24 @@
 import React, { useState } from "react";
-import { useParams, Link } from "react-router-dom";
+import { useParams, Link, useNavigate } from "react-router-dom";
 import mock from "../mock-data";
 
 export default function AlbumPage() {
   const { id } = useParams();
-  const album = mock.albums.find((a) => a.id == id);
+  const navigate = useNavigate();
 
-  const [photos, setPhotos] = useState(() => {
-    const saved = JSON.parse(localStorage.getItem("albums") || "[]");
-    const stored = saved.find((x) => x.id == id);
-    return stored ? stored.photos : album.photos;
-  });
+  // ищем альбом
+  const album =
+    JSON.parse(localStorage.getItem("albums") || "[]").find(
+      (a) => a.id == id
+    ) || mock.albums.find((a) => a.id == id);
 
+  const [photos, setPhotos] = useState(album.photos);
   const [full, setFull] = useState(null);
 
+  // 🔥 Для удаления
+  const [showDelete, setShowDelete] = useState(false);
+
+  // 🔍 Зум
   const [scale, setScale] = useState(1);
   const [pos, setPos] = useState({ x: 0, y: 0 });
   const [dragging, setDragging] = useState(false);
@@ -44,11 +49,8 @@ export default function AlbumPage() {
   const stopDrag = () => setDragging(false);
 
   const doubleClick = () => {
-    if (scale === 1) {
-      setScale(2);
-    } else {
-      resetZoom();
-    }
+    if (scale === 1) setScale(2);
+    else resetZoom();
   };
 
   const handleUpload = (e) => {
@@ -56,19 +58,31 @@ export default function AlbumPage() {
     if (!file) return;
 
     const url = URL.createObjectURL(file);
-    const newList = [...photos, url];
-    setPhotos(newList);
+    const list = [...photos, url];
+    setPhotos(list);
 
     const saved = JSON.parse(localStorage.getItem("albums") || "[]");
-    const idx = saved.findIndex((x) => x.id == id);
+    const idx = saved.findIndex((a) => a.id == id);
     if (idx !== -1) {
-      saved[idx].photos = newList;
+      saved[idx].photos = list;
       localStorage.setItem("albums", JSON.stringify(saved));
     }
   };
 
+  // 🔥 Удаление альбома
+  function deleteAlbum() {
+    const saved = JSON.parse(localStorage.getItem("albums") || "[]");
+    const newList = saved.filter((a) => a.id != id);
+
+    localStorage.setItem("albums", JSON.stringify(newList));
+
+    setShowDelete(false);
+    navigate("/");
+  }
+
   return (
     <div className="album-page">
+      {/* --- Полноразмерная картинка --- */}
       {full && (
         <div
           className="modal"
@@ -94,6 +108,7 @@ export default function AlbumPage() {
             >
               Х
             </button>
+
             <img
               src={full}
               alt=""
@@ -117,8 +132,45 @@ export default function AlbumPage() {
       <h1>{album.title}</h1>
       <p>{album.description}</p>
 
-      <h3>Загрузить фото</h3>
-      <input type="file" onChange={handleUpload} />
+      {localStorage.getItem("user") && (
+        <button
+          onClick={() => {
+            if (!confirm("Удалить альбом? Это действие нельзя отменить."))
+              return;
+
+            const saved = JSON.parse(localStorage.getItem("albums") || "[]");
+            const updated = saved.filter((a) => a.id != id);
+            localStorage.setItem("albums", JSON.stringify(updated));
+
+            // переход на главную
+            window.location.href = "/";
+          }}
+          style={{
+            padding: "10px 16px",
+            background: "#e53935",
+            color: "white",
+            border: "none",
+            borderRadius: "8px",
+            cursor: "pointer",
+            marginTop: "10px",
+            fontWeight: "bold",
+          }}
+        >
+          🗑 Удалить альбом
+        </button>
+      )}
+
+      {localStorage.getItem("user") ? (
+        <>
+          <h3>Загрузить фото</h3>
+          <input type="file" onChange={handleUpload} />
+        </>
+      ) : (
+        <p style={{ opacity: 0.7, marginTop: "20px" }}>
+          🔒 Чтобы загружать фотографии или удалять альбомы —{" "}
+          <Link to="/login">войдите в аккаунт</Link>.
+        </p>
+      )}
 
       <div className="photos">
         {photos.map((p, i) => (

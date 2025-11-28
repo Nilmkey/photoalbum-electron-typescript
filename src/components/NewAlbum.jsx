@@ -1,11 +1,11 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 
 export default function NewAlbum() {
   const [title, setTitle] = useState("");
   const [desc, setDesc] = useState("");
   const [author, setAuthor] = useState("");
-  const [room, setRoom] = useState("Nature");
+  const [room, setRoom] = useState(""); // пользователь вводит категорию
   const [cover, setCover] = useState(null);
 
   const navigate = useNavigate();
@@ -21,15 +21,31 @@ export default function NewAlbum() {
   function handleCreate(e) {
     e.preventDefault();
 
+    // Загружаем список сохранённых альбомов
+    const saved = JSON.parse(localStorage.getItem("albums") || "[]");
+
+    // Проверка: существует ли альбом с таким названием
+    const exists = saved.some(
+      (a) => a.title.trim().toLowerCase() === title.trim().toLowerCase()
+    );
+
+    if (exists) {
+      alert("Альбом с таким названием уже существует!");
+      return;
+    }
+
+    // Создаём новый альбом
     const newAlbum = {
-      title,
-      description: desc,
-      room,
+      id: Date.now(),
+      title: title.trim(),
+      description: desc.trim(),
+      author: author.trim() || "Не указан",
+      room: room.trim() || "Без категории",
       photos: cover ? [cover] : [],
+      year: new Date().getFullYear(),
     };
 
-    // const res = fetch() // сюда фетч запрос ебнуть на создание альбома
-
+    saved.push(newAlbum);
     localStorage.setItem("albums", JSON.stringify(saved));
 
     navigate("/");
@@ -63,14 +79,13 @@ export default function NewAlbum() {
             onChange={(e) => setAuthor(e.target.value)}
           />
 
-          <select value={room} onChange={(e) => setRoom(e.target.value)}>
-            <option value="Nature">Природа</option>
-            <option value="City">Города</option>
-            <option value="Travel">Путешествия</option>
-            <option value="Gaming">Гейминг</option>
-            <option value="Memes">Мемы</option>
-            <option value="Other">Другое</option>
-          </select>
+          <input
+            type="text"
+            placeholder="Категория / комната"
+            value={room}
+            onChange={(e) => setRoom(e.target.value)}
+            required
+          />
 
           <div className="cover-upload">
             <label>Загрузить обложку</label>
@@ -82,6 +97,10 @@ export default function NewAlbum() {
           <button type="submit" className="create-btn">
             Создать
           </button>
+
+          <Link to="/" className="back">
+            ← Назад
+          </Link>
         </form>
       </div>
     </div>
