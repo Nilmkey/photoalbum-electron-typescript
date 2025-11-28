@@ -222,7 +222,7 @@ export default function AuthUploadPage() {
             "http://localhost:3050/api/verify-token",
             {
               method: "GET",
-              headers: { authorization: `Bearer ${token}` },
+              headers: { Authorization: `Bearer ${token}` },
             }
           );
 

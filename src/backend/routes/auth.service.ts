@@ -72,8 +72,15 @@ class AuthService {
     }
   }
 
-  async removePhoto(albumId: string) {
-    if (!albumId) throw new Error("album not found");
+  async getRoomAlbum(albumRoom: string) {
+    try {
+      if (!albumRoom) throw new Error("room not found");
+      const roomAlbums = await albumModel.find({ room: albumRoom });
+      if (!roomAlbums) throw new Error("albums with at room not exists");
+      return roomAlbums;
+    } catch (e) {
+      throw new Error("db get room error: " + e);
+    }
   }
 }
 

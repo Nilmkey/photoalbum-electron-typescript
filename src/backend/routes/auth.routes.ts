@@ -16,7 +16,7 @@ router.post("/register", authController.regUser);
 router.post("/login", authController.loginUser);
 
 //cooikes
-router.get("/verify-token", authController.verifyToken);
+// router.get("/verify-token", authController.verifyToken);
 
 //albums
 router.post(

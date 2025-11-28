@@ -6,7 +6,6 @@ import { generateToken, type JWTPayload } from "../utils/token.ts";
 import { v4 as uuidv4 } from "uuid";
 import { verifyToken } from "../utils/token.ts";
 import type { IAlbum } from "./models/album.model.ts";
-import { error } from "console";
 
 class AuthController {
   async regUser(req: Request, res: Response) {
@@ -80,16 +79,6 @@ class AuthController {
     }
   }
 
-  // async getCookies(req: Request, res: Response) {
-  //   try {
-  //     const sssCokie = req.cookies["sss"];
-  //     console.log(sssCokie);
-  //     res.status(200).json(sssCokie);
-  //   } catch (e) {
-  //     res.status(500).json("cookie error" + e);
-  //   }
-  // }
-
   async createAlbum(req: Request, res: Response) {
     if (!req.user) return res.status(401).json({ error: "user not auth" });
     if (!req.body) return res.status(400).json({ error: "no req body" });
@@ -98,6 +87,10 @@ class AuthController {
     const body = req.body;
     const userId = req.user?.id;
     const usernameAuthor = req.user?.username;
+    const room = body.room;
+    const category = ["Memes", "City", "Travel", "Nature", "Gaming", "Another"];
+    if (!category.includes(room))
+      return res.status(401).json({ error: "unacceptable room" });
     const dataAlbum = {
       id: "ALBUM-" + uuidv4(),
       userId: userId,
@@ -158,24 +151,25 @@ class AuthController {
     }
   }
 
-  async getAlbums(_req: Request, res: Response) {
-    try {
-      const arrayAlbums = await authService.getAllAlbum();
-      return res.status(200).json(arrayAlbums);
-    } catch (e) {
-      return res.status(500).json({ error: e });
-    }
-  }
+  async getAlbums(req: Request, res: Response) {
+    if (!req.query) {
+      try {
+        const arrayAlbums = await authService.getAllAlbum();
+        return res.status(200).json(arrayAlbums);
+      } catch (e) {
+        return res.status(500).json({ error: e });
+      }
+    } else {
+      const queries = req.query;
+      if (!queries.room) return res.status(401);
+      const room: string = queries.room as string;
 
-  async removePhoto(req: Request, res: Response) {
-    if (!req.params.id)
-      return res.status(404).json({ error: "id not received" });
-    try {
-      const albumId = req.params.id;
-      const album = await authService.removePhoto(albumId);
-      return res.status(200).json(album);
-    } catch (e) {
-      return res.status(500).json({ error: e });
+      try {
+        const roomAlbums = await authService.getRoomAlbum(room);
+        return res.status(200).json(roomAlbums);
+      } catch (e) {
+        return res.status(500).json(e);
+      }
     }
   }
 }
