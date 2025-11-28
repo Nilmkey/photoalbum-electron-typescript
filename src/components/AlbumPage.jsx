@@ -6,7 +6,6 @@ export default function AlbumPage() {
   const { id } = useParams();
   const navigate = useNavigate();
 
-  // ищем альбом
   const album =
     JSON.parse(localStorage.getItem("albums") || "[]").find(
       (a) => a.id == id
@@ -15,10 +14,10 @@ export default function AlbumPage() {
   const [photos, setPhotos] = useState(album.photos);
   const [full, setFull] = useState(null);
 
-  // 🔥 Для удаления
+  const [filter, setFilter] = useState("none");
+
   const [showDelete, setShowDelete] = useState(false);
 
-  // 🔍 Зум
   const [scale, setScale] = useState(1);
   const [pos, setPos] = useState({ x: 0, y: 0 });
   const [dragging, setDragging] = useState(false);
@@ -69,20 +68,17 @@ export default function AlbumPage() {
     }
   };
 
-  // 🔥 Удаление альбома
   function deleteAlbum() {
     const saved = JSON.parse(localStorage.getItem("albums") || "[]");
     const newList = saved.filter((a) => a.id != id);
 
     localStorage.setItem("albums", JSON.stringify(newList));
-
     setShowDelete(false);
     navigate("/");
   }
-
   return (
     <div className="album-page">
-      {/* --- Полноразмерная картинка --- */}
+      {/* модалка ало*/}
       {full && (
         <div
           className="modal"
@@ -109,6 +105,24 @@ export default function AlbumPage() {
               Х
             </button>
 
+            {/* фильтры ало */}
+            <div className="filters">
+              <button onClick={() => setFilter("none")}>Обычное</button>
+              <button onClick={() => setFilter("grayscale(100%)")}>Ч/Б</button>
+              <button onClick={() => setFilter("sepia(80%)")}>Сепия</button>
+              <button onClick={() => setFilter("contrast(140%)")}>
+                Контраст
+              </button>
+              <button onClick={() => setFilter("brightness(130%)")}>
+                Ярче
+              </button>
+              <button onClick={() => setFilter("blur(2px)")}>Размытие</button>
+              <button onClick={() => setFilter("saturate(180%)")}>
+                Насыщенно
+              </button>
+            </div>
+
+            {/* большая картинка ало */}
             <img
               src={full}
               alt=""
@@ -119,6 +133,7 @@ export default function AlbumPage() {
                 transform: `translate(${pos.x}px, ${pos.y}px) scale(${scale})`,
                 transition: dragging ? "none" : "transform 0.2s",
                 userSelect: "none",
+                filter: filter,
               }}
             />
           </div>
@@ -132,6 +147,7 @@ export default function AlbumPage() {
       <h1>{album.title}</h1>
       <p>{album.description}</p>
 
+      {/* удаление альбома только для залогиненных ало */}
       {localStorage.getItem("user") && (
         <button
           onClick={() => {
@@ -142,7 +158,6 @@ export default function AlbumPage() {
             const updated = saved.filter((a) => a.id != id);
             localStorage.setItem("albums", JSON.stringify(updated));
 
-            // переход на главную
             window.location.href = "/";
           }}
           style={{
@@ -160,6 +175,7 @@ export default function AlbumPage() {
         </button>
       )}
 
+      {/* загрузка фото ало */}
       {localStorage.getItem("user") ? (
         <>
           <h3>Загрузить фото</h3>
@@ -167,11 +183,12 @@ export default function AlbumPage() {
         </>
       ) : (
         <p style={{ opacity: 0.7, marginTop: "20px" }}>
-          🔒 Чтобы загружать фотографии или удалять альбомы —{" "}
+          🔒 Чтобы загружать фотографии —{" "}
           <Link to="/login">войдите в аккаунт</Link>.
         </p>
       )}
 
+      {/* миниатюры ало */}
       <div className="photos">
         {photos.map((p, i) => (
           <img
