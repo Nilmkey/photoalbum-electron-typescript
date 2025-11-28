@@ -8,6 +8,10 @@ body.auth-page {
   font-family: "Segoe UI", sans-serif;
 }
 
+html .auth-link {
+  color: white;
+}
+
 .auth-container {
   width: 100%;
   max-width: 400px;
