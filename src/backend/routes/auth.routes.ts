@@ -40,11 +40,5 @@ router.delete(
   authAlbumMidddleware,
   authController.removeAlbum
 );
-router.delete(
-  "/album/:id/remove-photo",
-  authMiddleware,
-  authAlbumMidddleware,
-  authController.removePhoto()
-);
 
 export default router;

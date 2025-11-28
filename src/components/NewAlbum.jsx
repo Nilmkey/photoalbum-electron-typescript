@@ -7,48 +7,58 @@ export default function NewAlbum() {
   const [author, setAuthor] = useState("");
   const [room, setRoom] = useState(""); // пользователь вводит категорию
   const [cover, setCover] = useState(null);
+  const getCookies = window.electronAPI.getCookie;
 
   const navigate = useNavigate();
 
+  async function handleCreate(e) {
+    e.preventDefault();
+    try {
+      // 1. собираем FormData для backend
+      const formData = new FormData();
+      formData.append("title", title);
+      formData.append("description", desc);
+      formData.append("author", author || "Не указан");
+      formData.append("room", room || "Без категории");
+
+      // если есть файл — добавляем (это важно!)
+      const fileInput = document.querySelector('input[type="file"]');
+      if (fileInput && fileInput.files[0]) {
+        formData.append("cover", fileInput.files[0]);
+      }
+
+      // 2. проверяем токен
+      const token = await getCookies("token");
+      if (!token) throw new Error("пользователь не авторизирован");
+
+      // 3. отправляем запрос на backend
+      const res = await fetch("http://localhost:3050/api/create-album", {
+        method: "POST",
+        headers: {
+          authorization: `Bearer ${token}`,
+          // !!! НЕ добавляй "Content-Type": multipart сам !!!
+        },
+        body: formData,
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) throw new Error(data.message || "Ошибка сервера");
+
+      alert("Альбом создан!");
+
+      // 4. редирект
+      navigate("/");
+    } catch (err) {
+      alert("Ошибка создания альбома: " + err.message);
+    }
+  }
   function handleCoverUpload(e) {
     const file = e.target.files[0];
     if (!file) return;
 
     const url = URL.createObjectURL(file);
     setCover(url);
-  }
-
-  function handleCreate(e) {
-    e.preventDefault();
-
-    // загружаем список сохранённых альбомов
-    const saved = JSON.parse(localStorage.getItem("albums") || "[]");
-
-    // проверка существует ли альбом с таким названием
-    const exists = saved.some(
-      (a) => a.title.trim().toLowerCase() === title.trim().toLowerCase()
-    );
-
-    if (exists) {
-      alert("Альбом с таким названием уже существует!");
-      return;
-    }
-
-    // создаём новый альбом
-    const newAlbum = {
-      id: Date.now(),
-      title: title.trim(),
-      description: desc.trim(),
-      author: author.trim() || "Не указан",
-      room: room.trim() || "Без категории",
-      photos: cover ? [cover] : [],
-      year: new Date().getFullYear(),
-    };
-
-    saved.push(newAlbum);
-    localStorage.setItem("albums", JSON.stringify(saved));
-
-    navigate("/");
   }
 
   return (

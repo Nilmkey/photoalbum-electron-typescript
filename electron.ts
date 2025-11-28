@@ -90,6 +90,10 @@ ipcMain.handle(
 );
 
 ipcMain.handle("remove-cookie", async (_event, cookie: { name: string }) => {
+  if (!cookie.name) {
+    console.log("name cookies is ungefiend" + cookie.name);
+    return false;
+  }
   try {
     await session.defaultSession.cookies.remove(
       "http:/localhost:3050",

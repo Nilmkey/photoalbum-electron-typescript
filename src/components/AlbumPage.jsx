@@ -150,15 +150,35 @@ export default function AlbumPage() {
       {/* удаление альбома только для залогиненных ало */}
       {localStorage.getItem("user") && (
         <button
-          onClick={() => {
+          onClick={async () => {
             if (!confirm("Удалить альбом? Это действие нельзя отменить."))
               return;
 
-            const saved = JSON.parse(localStorage.getItem("albums") || "[]");
-            const updated = saved.filter((a) => a.id != id);
-            localStorage.setItem("albums", JSON.stringify(updated));
+            try {
+              const token = JSON.parse(localStorage.getItem("user"))?.token;
 
-            window.location.href = "/";
+              const res = await fetch(
+                `http://localhost:3050/api/album/${id}/remove-album`,
+                {
+                  method: "DELETE",
+                  headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${token}`,
+                  },
+                }
+              );
+
+              if (!res.ok) {
+                alert("Ошибка при удалении альбома");
+                return;
+              }
+
+              alert("Альбом удалён!");
+              navigate("/");
+            } catch (err) {
+              console.error(err);
+              alert("Сервер не отвечает");
+            }
           }}
           style={{
             padding: "10px 16px",

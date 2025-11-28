@@ -16,6 +16,10 @@ html[data-theme="dark"] {
   color-scheme: dark;
 }
 
+html .btn {
+  background: #16306d;
+}
+
 * {
   box-sizing: border-box;
 }

@@ -8,6 +8,11 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import SwitchTheme from "./components/SwitchTheme";
 
 export default function App() {
+  async function removeCookies(name) {
+    const removeToken = await window.electronAPI.removeCookie({ name });
+    return removeToken;
+  }
+
   const [filters, setFilters] = useState({
     yearFrom: "",
     yearTo: "",
@@ -85,9 +90,10 @@ export default function App() {
             ) : (
               <button
                 className="btn"
-                onClick={() => {
+                onClick={async () => {
                   localStorage.removeItem("user");
                   window.location.reload();
+                  await removeCookies("token");
                 }}
               >
                 Выйти
