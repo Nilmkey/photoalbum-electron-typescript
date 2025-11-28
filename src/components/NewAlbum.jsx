@@ -89,13 +89,14 @@ export default function NewAlbum() {
             onChange={(e) => setAuthor(e.target.value)}
           />
 
-          <input
-            type="text"
-            placeholder="Категория / комната"
-            value={room}
-            onChange={(e) => setRoom(e.target.value)}
-            required
-          />
+          <select name="room" id="">
+            <option value="Memes">Мемы</option>
+            <option value="City">Города</option>
+            <option value="Travel">Путешествия</option>
+            <option value="Nature">Природа</option>
+            <option value="Gaming">Гейминг</option>
+            <option value="Other">Другое</option>
+          </select>
 
           <div className="cover-upload">
             <label>Загрузить обложку</label>
