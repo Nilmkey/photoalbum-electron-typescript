@@ -30,6 +30,7 @@ class AuthController {
   }
 
   async loginUser(req: Request, res: Response) {
+    console.log("aloalo");
     const body = req.body;
     const authorizationData = {
       username: body.username as string,
@@ -151,26 +152,30 @@ class AuthController {
     }
   }
 
-  async getAlbums(req: Request, res: Response) {
-    if (!req.query) {
-      try {
-        const arrayAlbums = await authService.getAllAlbum();
-        return res.status(200).json(arrayAlbums);
-      } catch (e) {
-        return res.status(500).json({ error: e });
-      }
-    } else {
-      const queries = req.query;
-      if (!queries.room) return res.status(401);
-      const room: string = queries.room as string;
-
-      try {
-        const roomAlbums = await authService.getRoomAlbum(room);
-        return res.status(200).json(roomAlbums);
-      } catch (e) {
-        return res.status(500).json(e);
-      }
+  async getAlbums(_req: Request, res: Response) {
+    console.log("aloalo");
+    try {
+      const arrayAlbums = await authService.getAllAlbum();
+      console.log(arrayAlbums);
+      return res.status(200).json(arrayAlbums);
+    } catch (e) {
+      return res.status(500).json({ error: e });
     }
+    // if (!req.query) {
+
+    // } else {
+    //   const queries = req.query;
+    //   if (!queries.room) return res.status(401);
+    //   const room: string = queries.room as string;
+
+    //   try {
+    //     const roomAlbums = await authService.getRoomAlbum(room);
+    //     console.log(roomAlbums);
+    //     return res.status(200).json(roomAlbums);
+    // } catch (e) {
+    //   return res.status(500).json(e);
+    // }
+    // }
   }
 }
 

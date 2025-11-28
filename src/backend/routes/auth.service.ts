@@ -53,8 +53,10 @@ class AuthService {
   }
 
   async getAllAlbum() {
+    console.log("service alo alo");
     try {
       const album = await albumModel.find();
+      console.log(album);
       if (!album) throw new Error("альбомов несуществует");
       return album;
     } catch (e) {

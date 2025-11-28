@@ -19,6 +19,18 @@ export default function AuthUploadPage() {
     return token;
   }
 
+  async function handle() {
+    try {
+      const res = await fetch("http://localhost:3050/api/albums", {
+        method: "POST",
+      });
+      data = res.json;
+      setMsg(data);
+    } catch (e) {
+      setMsg("err0r fetch" + e);
+    }
+  }
+
   //удаление куков
   async function removeCookies(name) {
     const removeToken = await window.electronAPI.removeCookie(name);
@@ -294,6 +306,8 @@ export default function AuthUploadPage() {
       <button onClick={handleCreateAlbum}>Создать альбом</button>
 
       {message && <p>{message}</p>}
+
+      <button onClick={handle}>fff</button>
     </div>
   );
 }

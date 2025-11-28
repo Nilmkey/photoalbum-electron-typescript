@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import FilterBar from "./components/FilterBar";
 import AlbumList from "./components/AlbumList";
 import Lightbox from "./components/Lightbox";
@@ -12,7 +12,7 @@ export default function App() {
     const removeToken = await window.electronAPI.removeCookie({ name });
     return removeToken;
   }
-
+  const [albums, setAlbums] = useState([]);
   const [filters, setFilters] = useState({
     yearFrom: "",
     yearTo: "",
@@ -23,7 +23,51 @@ export default function App() {
   const [sortBy, setSortBy] = useState("newest");
   const [lightbox, setLightbox] = useState({ open: false, url: "" });
 
-  const albums = mock.albums;
+  async function load() {
+    try {
+      const res = await fetch("http://localhost:3050/api/albums", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+      });
+
+      console.log("Response object:", res);
+
+      const data = await res.json();
+      console.log("Raw data:", data);
+
+      // Проверяем, что пришёл массив
+      if (!Array.isArray(data)) {
+        console.warn("Ожидался массив, но пришло:", data);
+        setAlbums({ albums: [] });
+        return;
+      }
+
+      // Преобразуем массив в нужный формат
+      const parsedAlbums = data.map((album) => ({
+        id: album.id,
+        room: album.room,
+        title: album.title,
+        description: album.description,
+        year: new Date(album.createdAt).getFullYear(),
+        month: new Date(album.createdAt).getMonth() + 1,
+        day: new Date(album.createdAt).getDate(),
+        author: album.author,
+        photos: album.photos || [], // если сервер возвращает пустой массив или undefined
+      }));
+
+      // Оборачиваем в объект с ключом albums
+      setAlbums(parsedAlbums);
+
+      console.log("Parsed albums:", { albums: parsedAlbums });
+    } catch (e) {
+      console.error("Fetch error:", e);
+      setAlbums({ albums: [] });
+    }
+  }
+
+  useEffect(() => {
+    load();
+  }, []);
 
   const filtered = useMemo(() => {
     return albums
@@ -75,6 +119,7 @@ export default function App() {
     <div className="app">
       <header>
         <h1>Фотоальбомы</h1>
+        <button onClick={load}>refresh</button>
         <p className="subtitle">Комнаты, альбомы и фотогалерея</p>
         <div className="auth">
           <div className="auth">

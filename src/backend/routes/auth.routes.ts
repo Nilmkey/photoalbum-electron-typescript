@@ -13,7 +13,14 @@ router.get("/get-photo", (_req: Request, res: Response) => {
 
 //auth
 router.post("/register", authController.regUser);
-router.post("/login", authController.loginUser);
+router.post(
+  "/login",
+  (_req, _res, next) => {
+    console.log("GET /albums received");
+    next();
+  },
+  authController.loginUser
+);
 
 //cooikes
 // router.get("/verify-token", authController.verifyToken);
@@ -33,7 +40,14 @@ router.post(
   upload.array("file", 100),
   authController.addPhototoAlbum
 );
-router.get("/albums", authController.getAlbums);
+router.post(
+  "/albums",
+  (_req, _res, next) => {
+    console.log("GET /albums received");
+    next();
+  },
+  authController.getAlbums
+);
 router.delete(
   "/album/:id/remove-album",
   authMiddleware,

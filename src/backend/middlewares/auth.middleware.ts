@@ -6,8 +6,8 @@ export default function authMiddleware(
   res: Response,
   next: NextFunction
 ) {
-  if (!req.headers["authorization"]) return res.status(401);
-  const authHeaders = req.headers["authorization"]!;
+  if (!req.headers["Authorization"]) return res.status(401);
+  const authHeaders = req.headers["Authorization"]!;
   const authToken = authHeaders.split(" ")[1];
   const decoded = verifyToken(authToken);
   if (!decoded) {
